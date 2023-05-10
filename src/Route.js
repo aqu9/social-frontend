@@ -1,7 +1,8 @@
-// import SignIn from '../pages/loginPage/login';
-import AllPost from './component/post/AllPost';
+
+import PostById from './pages/PostDetailsById';
 import SignIn from './pages/SignIn';
 import Post from './pages/post';
+import ProfilePage from './pages/profile';
 import Sign_up from './pages/signup';
 // import AllPost from '';
 
@@ -26,6 +27,16 @@ const Routes = () => {
       path: '/posts',
       title: 'posts',
       component: Post,
+    },
+    {
+      path: '/posts/:id',
+      title: 'posts',
+      component: PostById,
+    },
+    {
+      path: '/profile',
+      title: 'profile',
+      component: ProfilePage,
     },
   ];
 

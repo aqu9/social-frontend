@@ -6,12 +6,14 @@ import ProfileCard from '../component/profile/profileCard';
 import AddpostModal from '../component/post/AddPost';
 import {useDispatch, useSelector} from "react-redux"
 import { setOpenAddPost } from '../store/posts/postReducers';
+import PostDetails from '../component/post/PostDetails';
 
-const Post = () => {
+const PostById = () => {
   const dispatch = useDispatch()
   const { openAddPost } = useSelector(
     (state) => state.postReducers
   )
+
 
   const toggleAddPost = (data) => {
     dispatch(setOpenAddPost(data))
@@ -29,7 +31,7 @@ const Post = () => {
             padding: '10px',
             mr: 5,
           }}>
-          <AllPost  />
+          <PostDetails  />
         </Box>
         <Box sx={{ flex: '2 0 0', p: 5 }}>
           <ProfileCard SetPostModal={toggleAddPost}/>
@@ -40,4 +42,4 @@ const Post = () => {
   );
 };
 
-export default Post;
+export default PostById;

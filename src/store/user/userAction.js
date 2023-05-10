@@ -1,18 +1,37 @@
-import { createSlice } from '@reduxjs/toolkit';
+import axiosInstance from "../../helper/axiosInstance";
+const uploadFile = (body) => {
+  return async (dispatch, getState) => {
+    try {
+      const { data } = await axiosInstance({
+        baseURL: 'http://localhost:3000/',
+        method: 'POST',
+        url: `/uploadImage`,
+        data: body,
+      });
 
-const userReducers = createSlice({
-  initialState: {
-    user: {},
-    isLoggedIn: false,
-  },
-  name: 'leads_Reducers',
-  reducers: {
-    setIsLoggedIn: (state, { payload }) => {
-      state.isLoggedIn = payload;
-    },
-  },
-});
+      return data;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  };
+};
+const addNewPost = (body) => {
+  return async (dispatch, getState) => {
+    try {
+      const { data } = await axiosInstance({
+        baseURL: 'http://localhost:3000/',
+        method: 'POST',
+        url: `/post`,
+        data: body,
+      });
 
-export const { user } = userReducers.actions;
+      return data;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  };
+};
 
-export default userReducers.reducer;
+export { uploadFile, addNewPost };

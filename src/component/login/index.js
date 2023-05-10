@@ -1,6 +1,8 @@
 import { AccountCircle } from '@mui/icons-material';
 import KeyIcon from '@mui/icons-material/Key';
 import PersonIcon from '@mui/icons-material/Person';
+import { useNavigate} from 'react-router-dom';
+
 import {
   Box,
   Button,
@@ -9,8 +11,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import {useDispatch} from "react-redux"
 // import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { LoginUser } from '../../store/authAction';
+import Cookies from 'js-cookie';
 const initialstate = {
   loginDetails: {
     userId: '',
@@ -19,14 +24,28 @@ const initialstate = {
 };
 
 const Login = () => {
-  //   const router = useRouter();
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [state, setState] = useState(initialstate);
   const {
     loginDetails: { userId, password },
   } = state;
+
+  useEffect(()=>{
+    if(Cookies.get("access_token")){
+      navigate('/posts');
+
+    }
+  },[])
+
   const LoginDetails = (event) => {
     event.preventDefault();
-    console.log('hello', state);
+    dispatch(LoginUser(state.loginDetails)).then((res)=>{
+      if(res){
+        navigate("/posts")
+        setState(initialstate)
+      }
+    })
   };
   const handleDetails = ({ target }) => {
     const { name, value } = target;
@@ -127,7 +146,7 @@ const Login = () => {
               Log In
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
-              Didn't have a account ? Sign up
+              Didn't have a account ? {<Button onClick={()=>navigate("/signup")}>Sign up</Button>}
             </Typography>
           </Box>
         </Card>

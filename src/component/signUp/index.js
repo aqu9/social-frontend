@@ -1,8 +1,10 @@
-import { AccountCircle } from '@mui/icons-material';
+import { AccountCircle, Cookie } from '@mui/icons-material';
 import EmailIcon from '@mui/icons-material/Email';
 import KeyIcon from '@mui/icons-material/Key';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import PersonIcon from '@mui/icons-material/Person';
+import { useNavigate } from 'react-router-dom';
+
 import {
   Box,
   Button,
@@ -10,9 +12,14 @@ import {
   InputAdornment,
   TextField,
   Typography,
+  Avatar,
 } from '@mui/material';
-// import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+
+import { useEffect, useRef, useState } from 'react';
+import { signUpUser } from '../../store/authAction';
+import { uploadFile } from '../../store/user/userAction';
+import Cookies from 'js-cookie';
 const initialstate = {
   signUpDetails: {
     name: '',
@@ -23,14 +30,29 @@ const initialstate = {
 };
 
 const SignUp = () => {
-  //   const router = useRouter();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const fileInputRef = useRef(null);
+
+  useEffect(()=>{
+    if(Cookies.get("access_token")){
+      navigate('/posts');
+
+    }
+  },[])
+
   const [state, setState] = useState(initialstate);
   const {
     signUpDetails: { email, password, name, phone },
   } = state;
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log('hello', state);
+    dispatch(signUpUser(state.signUpDetails)).then((res) => {
+      if (res) {
+        navigate('/login');
+        setState(initialstate)
+      }
+    });
   };
   const handleDetails = ({ target }) => {
     const { name, value } = target;
@@ -41,6 +63,23 @@ const SignUp = () => {
         [name]: value,
       },
     }));
+  };
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append("image", file);
+    dispatch(uploadFile(formData)).then((res)=>{
+      setState((prevState) => ({
+        ...prevState,
+        signUpDetails: {
+          ...prevState.signUpDetails,
+          ["profilePic"]: res.url,
+        },
+      }));
+    })
+    // console.log(file);
+    // do something with the selected file
   };
   return (
     <Box
@@ -67,7 +106,7 @@ const SignUp = () => {
             boxShadow: 10,
             backgroundColor: 'rgba(255, 255, 255, 0.5)',
           }}>
-          <PersonIcon
+          {/* <PersonIcon
             style={{
               backgroundColor: '#e8f0fe',
               borderRadius: '90%',
@@ -78,6 +117,30 @@ const SignUp = () => {
               top: -35,
               zIndex: 99,
             }}
+          /> */}
+          <Avatar
+            sx={{
+              width:50,
+              height:50,
+              backgroundColor: '#e8f0fe',
+              borderRadius: '90%',
+              padding: '10px',
+              fontSize: '50px',
+              boxShadow: '0px 0px 5px grey',
+              position: 'absolute',
+              top: -35,
+              zIndex: 99,
+              cursor:"pointer"
+            }}
+            onClick={() => fileInputRef.current.click()}
+            src={state?.signUpDetails?.profilePic}
+            >
+          </Avatar>
+            <input
+            type='file'
+            onChange={handleFileUpload}
+            ref={fileInputRef}
+            style={{ display: 'none' }}
           />
           <Box component='form' onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <TextField
@@ -174,7 +237,8 @@ const SignUp = () => {
               Log In
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
-              Already have a account ? Sign in
+              Already have a account ?{' '}
+              {<Button onClick={() => navigate('/login')}>Sign In</Button>}
             </Typography>
           </Box>
         </Card>

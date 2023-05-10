@@ -1,16 +1,35 @@
-import React, { useState } from 'react';
-import data from '../../data/post.json';
-import { Buffer } from 'buffer';
+import React, { useEffect, useState } from 'react';
+
+import {useDispatch, useSelector} from "react-redux"
 import {
   Avatar,
   Box,
   Card,
   Divider,
-  TextField,
   Typography,
+  Button
 } from '@mui/material';
+import { getAllPosts } from '../../store/posts/postActions';
+import { useNavigate} from 'react-router-dom';
+
+import SendIcon from '@mui/icons-material/Send';
+
 
 const AllPost = () => {
+  const navigate = useNavigate()
+
+  const { posts } = useSelector(
+    (state) => state.postReducers
+  )
+  const [comment, setComment]= useState()
+  const dispatch = useDispatch()
+  useEffect(()=>{
+    dispatch(getAllPosts())
+  },[])
+  const handleCommentClick = (comment, id) =>{
+    alert(comment, id)
+    console.log("post._id",id)
+  }
   return (
     <>
       <Box
@@ -18,11 +37,7 @@ const AllPost = () => {
           pt: 2,
 
         }}>
-        {data.map((post, index) => {
-          let base64String;
-          if (post.postImage) {
-            base64String = Buffer.from(post.postImage).toString('base64');
-          }
+        {posts.length > 0 && posts.map((post, index) => {
           return (
             <Card
               sx={{
@@ -36,9 +51,10 @@ const AllPost = () => {
                 backgroundColor: 'rgba(255, 255, 255, 0.5)',
                 margin: 'auto',
                 marginBottom: '20px',
+                width:"700px"
                 
               }}
-              key={post._id}>
+              key={post?._id}>
               <Box
                 sx={{
                   width: '100%',
@@ -46,11 +62,11 @@ const AllPost = () => {
                   alignItems: 'center',
                   columnGap: 1,
                 }}>
-                <Avatar src={`data:image/jpeg;base64,${base64String}`}>
-                  A
+                <Avatar src={post?.user?.profilePic}>
+                {post?.user?.name[0]  }
                 </Avatar>
                 <Typography sx={{ textAlign: 'left' }}>
-                  {post.user.name}
+                  {post?.user?.name}
                 </Typography>
               </Box>
               <Divider sx={{ width: '100%', my: 2 }} />
@@ -62,19 +78,13 @@ const AllPost = () => {
                   <Box
                     component={'img'}
                     sx={{ width: '100%', height: '450px', objectFit: 'fill' }}
-                    src={`data:image/jpeg;base64,${base64String}`}
+                    src={post.postImage}
                     alt={'image'}
                   />
                 )}
               </Box>
-              <Box sx={{ width: '100%' }}>
-                <TextField
-                  placeholder='comment'
-                  size='small'
-                  variant='standard'
-                  fullWidth
-                />
-              </Box>
+              <Button sx={{color:"black", fontWeight:"bold"}} onClick={()=>navigate(`/posts/${post?._id}`)}>Comments</Button>
+        
             </Card>
           );
         })}
